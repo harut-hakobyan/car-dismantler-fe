@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { authStorage } from '../auth/storage';
 
 const api = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
@@ -9,17 +10,14 @@ const api = axios.create({
     withCredentials: true,
 });
 
+api.interceptors.request.use((config) => {
+    const token = authStorage.getToken();
 
-api.interceptors.response.use(
-    response => response,
-    error => {
-        if (error.response?.status === 401) {
-            console.log('Unauthorized');
-        }
-
-        return Promise.reject(error);
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
     }
-);
 
+    return config;
+});
 
 export default api;
