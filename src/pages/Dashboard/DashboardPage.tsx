@@ -1,5 +1,6 @@
 import {
     Box,
+    Chip,
     Grid,
     LinearProgress,
     Paper,
@@ -35,7 +36,12 @@ export default function DashboardPage() {
         queryKey: ['dashboard-recent-orders'],
         queryFn: dashboardApi.recentOrders,
     });
+    const detailsQuery = useQuery({
+        queryKey: ['dashboard-details'],
+        queryFn: dashboardApi.details,
+    });
     const summary = summaryQuery.data;
+    const details = detailsQuery.data;
     const stats = [
         { label: t('nav.cars'), value: summary?.cars ?? 0, icon: <DirectionsCarIcon /> },
         { label: t('nav.parts'), value: summary?.parts ?? 0, icon: <Inventory2Icon /> },
@@ -44,6 +50,16 @@ export default function DashboardPage() {
     ];
     const inventoryValue = summary?.inventoryValue ?? 0;
     const pendingOrders = summary?.pendingOrders ?? 0;
+    const orderRevenue = details?.orderRevenue ?? 0;
+    const averageOrderValue = details?.averageOrderValue ?? 0;
+
+    function formatCurrency(value: number) {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            maximumFractionDigits: 0,
+        }).format(value);
+    }
 
     return (
         <>
@@ -90,7 +106,7 @@ export default function DashboardPage() {
             </Grid>
 
             <Grid container spacing={2} sx={{ mt: 1 }}>
-                <Grid size={{ xs: 12, lg: 4 }}>
+                <Grid size={{ xs: 12, lg: 3 }}>
                     <Paper sx={{ p: 3, borderRadius: 2, height: '100%' }}>
                         <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
                             {t('dashboard.inventorySummary')}
@@ -103,10 +119,7 @@ export default function DashboardPage() {
                                 >
                                     <Typography color="text.secondary">{t('dashboard.inventoryValue')}</Typography>
                                     <Typography sx={{ fontWeight: 700 }}>
-                                        {new Intl.NumberFormat('en-US', {
-                                            style: 'currency',
-                                            currency: 'USD',
-                                        }).format(inventoryValue)}
+                                        {formatCurrency(inventoryValue)}
                                     </Typography>
                                 </Stack>
                                 <LinearProgress
@@ -134,6 +147,156 @@ export default function DashboardPage() {
                     </Paper>
                 </Grid>
 
+                <Grid size={{ xs: 12, lg: 3 }}>
+                    <Paper sx={{ p: 3, borderRadius: 2, height: '100%' }}>
+                        <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
+                            {t('dashboard.salesSnapshot')}
+                        </Typography>
+                        <Stack spacing={2}>
+                            <Box>
+                                <Typography color="text.secondary" variant="body2">
+                                    {t('dashboard.completedRevenue')}
+                                </Typography>
+                                <Typography variant="h4" sx={{ fontWeight: 800 }}>
+                                    {formatCurrency(orderRevenue)}
+                                </Typography>
+                            </Box>
+                            <Box>
+                                <Typography color="text.secondary" variant="body2">
+                                    {t('dashboard.averageOrder')}
+                                </Typography>
+                                <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                                    {formatCurrency(averageOrderValue)}
+                                </Typography>
+                            </Box>
+                        </Stack>
+                    </Paper>
+                </Grid>
+
+                <Grid size={{ xs: 12, lg: 3 }}>
+                    <Paper sx={{ p: 3, borderRadius: 2, height: '100%' }}>
+                        <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
+                            {t('dashboard.orderStatus')}
+                        </Typography>
+                        <Stack spacing={2}>
+                            {(details?.orderStatusCounts ?? []).map((item) => (
+                                <Box key={item.status}>
+                                    <Stack
+                                        direction="row"
+                                        sx={{ justifyContent: 'space-between', mb: 0.5 }}
+                                    >
+                                        <StatusChip status={item.status} />
+                                        <Typography sx={{ fontWeight: 700 }}>
+                                            {item.count}
+                                        </Typography>
+                                    </Stack>
+                                    <LinearProgress
+                                        variant="determinate"
+                                        value={Math.min(100, item.count * 35)}
+                                    />
+                                </Box>
+                            ))}
+                        </Stack>
+                    </Paper>
+                </Grid>
+
+                <Grid size={{ xs: 12, lg: 3 }}>
+                    <Paper sx={{ p: 3, borderRadius: 2, height: '100%' }}>
+                        <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
+                            {t('dashboard.carStatus')}
+                        </Typography>
+                        <Stack spacing={2}>
+                            {(details?.carStatusCounts ?? []).map((item) => (
+                                <Box key={item.status}>
+                                    <Stack
+                                        direction="row"
+                                        sx={{ justifyContent: 'space-between', mb: 0.5 }}
+                                    >
+                                        <StatusChip status={item.status} />
+                                        <Typography sx={{ fontWeight: 700 }}>
+                                            {item.count}
+                                        </Typography>
+                                    </Stack>
+                                    <LinearProgress
+                                        color="secondary"
+                                        variant="determinate"
+                                        value={Math.min(100, item.count * 35)}
+                                    />
+                                </Box>
+                            ))}
+                        </Stack>
+                    </Paper>
+                </Grid>
+            </Grid>
+
+            <Grid container spacing={2} sx={{ mt: 1 }}>
+                <Grid size={{ xs: 12, lg: 4 }}>
+                    <Paper sx={{ p: 3, borderRadius: 2, height: '100%' }}>
+                        <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
+                            {t('dashboard.recentOrders')}
+                        </Typography>
+                        <Table size="small">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>{t('orders.customer')}</TableCell>
+                                    <TableCell>{t('common.status')}</TableCell>
+                                    <TableCell align="right">{t('common.total')}</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {(recentOrdersQuery.data ?? []).map((order) => (
+                                    <TableRow key={order.id}>
+                                        <TableCell>{order.customer_name}</TableCell>
+                                        <TableCell>
+                                            <StatusChip status={order.status} />
+                                        </TableCell>
+                                        <TableCell align="right">
+                                            {formatCurrency(order.total)}
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </Paper>
+                </Grid>
+
+                <Grid size={{ xs: 12, lg: 4 }}>
+                    <Paper sx={{ p: 3, borderRadius: 2, height: '100%' }}>
+                        <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
+                            {t('dashboard.lowStock')}
+                        </Typography>
+                        <Stack spacing={1.5}>
+                            {(details?.lowStockParts ?? []).map((part) => (
+                                <Stack
+                                    key={part.id}
+                                    direction="row"
+                                    sx={{ justifyContent: 'space-between', gap: 2 }}
+                                >
+                                    <Box>
+                                        <Typography sx={{ fontWeight: 700 }}>
+                                            {part.name}
+                                        </Typography>
+                                        <Typography color="text.secondary" variant="caption">
+                                            {part.sku}
+                                        </Typography>
+                                    </Box>
+                                    <Chip
+                                        label={`${part.quantity} ${t('dashboard.stockLeft')}`}
+                                        color={part.quantity <= 1 ? 'error' : 'warning'}
+                                        size="small"
+                                        variant="outlined"
+                                    />
+                                </Stack>
+                            ))}
+                            {(details?.lowStockParts ?? []).length === 0 && (
+                                <Typography color="text.secondary">
+                                    {t('dashboard.noLowStock')}
+                                </Typography>
+                            )}
+                        </Stack>
+                    </Paper>
+                </Grid>
+
                 <Grid size={{ xs: 12, lg: 4 }}>
                     <Paper sx={{ p: 3, borderRadius: 2, height: '100%' }}>
                         <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
@@ -156,32 +319,63 @@ export default function DashboardPage() {
                         </Stack>
                     </Paper>
                 </Grid>
+            </Grid>
 
-                <Grid size={{ xs: 12, lg: 4 }}>
-                    <Paper sx={{ p: 3, borderRadius: 2, height: '100%' }}>
+            <Grid container spacing={2} sx={{ mt: 1 }}>
+                <Grid size={{ xs: 12, lg: 6 }}>
+                    <Paper sx={{ p: 3, borderRadius: 2 }}>
                         <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
-                            {t('dashboard.recentOrders')}
+                            {t('dashboard.recentCars')}
                         </Typography>
                         <Table size="small">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>{t('orders.customer')}</TableCell>
+                                    <TableCell>{t('cars.make')}</TableCell>
+                                    <TableCell>{t('cars.model')}</TableCell>
+                                    <TableCell>{t('cars.year')}</TableCell>
                                     <TableCell>{t('common.status')}</TableCell>
-                                    <TableCell align="right">{t('common.total')}</TableCell>
+                                    <TableCell>{t('common.created')}</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {(recentOrdersQuery.data ?? []).map((order) => (
-                                    <TableRow key={order.id}>
-                                        <TableCell>{order.customer_name}</TableCell>
+                                {(details?.recentCars ?? []).map((car) => (
+                                    <TableRow key={car.id}>
+                                        <TableCell>{car.make}</TableCell>
+                                        <TableCell>{car.model}</TableCell>
+                                        <TableCell>{car.year}</TableCell>
                                         <TableCell>
-                                            <StatusChip status={order.status} />
+                                            <StatusChip status={car.status} />
                                         </TableCell>
+                                        <TableCell>{car.created_at}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </Paper>
+                </Grid>
+
+                <Grid size={{ xs: 12, lg: 6 }}>
+                    <Paper sx={{ p: 3, borderRadius: 2 }}>
+                        <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
+                            {t('dashboard.topInventory')}
+                        </Typography>
+                        <Table size="small">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>{t('parts.part')}</TableCell>
+                                    <TableCell>{t('parts.category')}</TableCell>
+                                    <TableCell align="right">{t('parts.quantity')}</TableCell>
+                                    <TableCell align="right">{t('dashboard.inventoryValue')}</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {(details?.topParts ?? []).map((part) => (
+                                    <TableRow key={part.id}>
+                                        <TableCell>{part.name}</TableCell>
+                                        <TableCell>{part.category}</TableCell>
+                                        <TableCell align="right">{part.quantity}</TableCell>
                                         <TableCell align="right">
-                                            {new Intl.NumberFormat('en-US', {
-                                                style: 'currency',
-                                                currency: 'USD',
-                                            }).format(order.total)}
+                                            {formatCurrency(part.price * part.quantity)}
                                         </TableCell>
                                     </TableRow>
                                 ))}

@@ -35,6 +35,8 @@ export interface PermissionResource {
 export interface CarResource {
     id: number;
     vin: string;
+    car_make_id?: number | null;
+    car_model_id?: number | null;
     make: string;
     model: string;
     year: number;
@@ -99,4 +101,32 @@ export interface ActivityItem {
     label: string;
     description: string;
     created_at: string;
+}
+
+export interface DashboardDetails {
+    orderRevenue: number;
+    averageOrderValue: number;
+    lowStockParts: PartResource[];
+    recentCars: CarResource[];
+    topParts: PartResource[];
+    orderStatusCounts: Array<{
+        status: Status;
+        count: number;
+    }>;
+    carStatusCounts: Array<{
+        status: Status;
+        count: number;
+    }>;
+}
+
+export interface CarMakeResource {
+    id: number;
+    name: string;
+    region?: string | null;
+}
+
+export interface CarModelResource {
+    id: number;
+    car_make_id: number;
+    name: string;
 }

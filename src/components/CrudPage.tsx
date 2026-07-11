@@ -68,7 +68,7 @@ function createEmptyRow<T extends ResourceRecord>(columns: Column<T>[], nextId: 
         }
 
         if (column.type === 'status') {
-            row[String(column.key)] = 'Active';
+            row[String(column.key)] = 'active';
             return;
         }
 
