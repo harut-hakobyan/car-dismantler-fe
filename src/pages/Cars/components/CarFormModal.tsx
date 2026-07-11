@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import {
+    Box,
     Button,
     CircularProgress,
     Dialog,
@@ -14,6 +15,7 @@ import {
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { CarMakeOption, CarModelOption, CarFormValues } from '../cars.types';
+import { carColors } from '../cars.types';
 import { carSchema } from '../cars.schema';
 
 interface Props {
@@ -196,12 +198,35 @@ export default function CarFormModal({
                                 control={control}
                                 render={({ field }) => (
                                     <TextField
+                                        select
                                         {...field}
                                         label="Color"
                                         fullWidth
+                                        value={field.value || ''}
                                         error={!!errors.color}
                                         helperText={errors.color?.message}
-                                    />
+                                    >
+                                        <MenuItem value="">
+                                            <em>Select color</em>
+                                        </MenuItem>
+                                        {carColors.map((color) => (
+                                            <MenuItem key={color} value={color}>
+                                                <Box
+                                                    sx={{
+                                                        width: 14,
+                                                        height: 14,
+                                                        borderRadius: 0.75,
+                                                        bgcolor: color.toLowerCase(),
+                                                        border: '1px solid',
+                                                        borderColor: 'divider',
+                                                        mr: 1,
+                                                        flexShrink: 0,
+                                                    }}
+                                                />
+                                                {color}
+                                            </MenuItem>
+                                        ))}
+                                    </TextField>
                                 )}
                             />
                         </Grid>
