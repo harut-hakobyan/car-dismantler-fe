@@ -26,6 +26,7 @@ import {
     type PartFormValues,
 } from '../parts.types';
 import { useTranslation } from '../../../hooks/useTranslation';
+import { AMD_CURRENCY_SYMBOL } from '../../../utils/currency';
 
 interface PartFormProps {
     formId: string;
@@ -217,14 +218,14 @@ export default function PartForm({
                             control={control}
                             render={({ field }) => (
                                 <FormControl fullWidth error={!!errors.price}>
-                                        <InputLabel>{t('parts.price')}</InputLabel>
+                                    <InputLabel>{t('parts.price')}</InputLabel>
                                     <OutlinedInput
                                         {...field}
                                         label={t('parts.price')}
                                         type="number"
                                         startAdornment={
                                             <InputAdornment position="start">
-                                                $
+                                                {AMD_CURRENCY_SYMBOL}
                                             </InputAdornment>
                                         }
                                         onChange={(event) =>

@@ -20,6 +20,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { sellPartSchema } from '../parts.schema';
 import type { PartSaleOption, SellPartFormValues } from '../parts.types';
 import { useTranslation } from '../../../hooks/useTranslation';
+import { AMD_CURRENCY_SYMBOL } from '../../../utils/currency';
 
 interface SellPartModalProps {
     open: boolean;
@@ -209,9 +210,9 @@ export default function SellPartModal({
                                             slotProps={{
                                                 input: {
                                                     startAdornment: (
-                                                    <InputAdornment position="start">
-                                                        $
-                                                    </InputAdornment>
+                                                        <InputAdornment position="start">
+                                                            {AMD_CURRENCY_SYMBOL}
+                                                        </InputAdornment>
                                                     ),
                                                 },
                                             }}

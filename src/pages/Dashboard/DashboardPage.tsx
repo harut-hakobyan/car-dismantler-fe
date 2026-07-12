@@ -21,6 +21,7 @@ import PageHeader from '../../components/PageHeader';
 import StatusChip from '../../components/StatusChip';
 import { dashboardApi } from '../../api/resources.api';
 import { useTranslation } from '../../hooks/useTranslation';
+import { formatAmdCurrency } from '../../utils/currency';
 
 export default function DashboardPage() {
     const { t } = useTranslation();
@@ -54,11 +55,7 @@ export default function DashboardPage() {
     const averageOrderValue = details?.averageOrderValue ?? 0;
 
     function formatCurrency(value: number) {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-            maximumFractionDigits: 0,
-        }).format(value);
+        return formatAmdCurrency(value);
     }
 
     return (

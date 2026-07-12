@@ -23,6 +23,7 @@ import type { OrderResource, Status } from '../../types/resources';
 import PageHeader from '../../components/PageHeader';
 import StatusChip from '../../components/StatusChip';
 import { useTranslation } from '../../hooks/useTranslation';
+import { formatAmdCurrency } from '../../utils/currency';
 
 const statuses: Status[] = ['pending', 'completed', 'cancelled'];
 
@@ -83,10 +84,7 @@ export default function OrdersPage() {
                                     <TableCell>{order.id}</TableCell>
                                     <TableCell>{order.customer_name}</TableCell>
                                     <TableCell>
-                                        {new Intl.NumberFormat('en-US', {
-                                            style: 'currency',
-                                            currency: 'USD',
-                                        }).format(order.total)}
+                                        {formatAmdCurrency(order.total)}
                                     </TableCell>
                                     <TableCell>
                                         <StatusChip status={order.status} />
