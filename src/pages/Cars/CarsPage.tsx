@@ -31,6 +31,7 @@ import type { CarResource } from '../../types/resources';
 import CarFormModal from './components/CarFormModal';
 import type { CarFormValues } from './cars.types';
 import { useTranslation } from '../../hooks/useTranslation';
+import { formatAmdCurrency } from '../../utils/currency';
 
 function toFormValues(car: CarResource): CarFormValues {
     return {
@@ -187,18 +188,10 @@ export default function CarsPage() {
                                         <StatusChip status={car.status} />
                                     </TableCell>
                                     <TableCell>
-                                        {new Intl.NumberFormat('en-US', {
-                                            style: 'currency',
-                                            currency: 'USD',
-                                            maximumFractionDigits: 0,
-                                        }).format(car.purchase_price)}
+                                        {formatAmdCurrency(car.purchase_price)}
                                     </TableCell>
                                     <TableCell>
-                                        {new Intl.NumberFormat('en-US', {
-                                            style: 'currency',
-                                            currency: 'USD',
-                                            maximumFractionDigits: 0,
-                                        }).format(car.sale_price)}
+                                        {formatAmdCurrency(car.sale_price)}
                                     </TableCell>
                                     <TableCell align="right">
                                         <Tooltip title={t('common.edit')}>

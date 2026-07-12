@@ -20,6 +20,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import StatusChip from '../../../components/StatusChip';
 import type { PartResource } from '../../../types/resources';
 import { useTranslation } from '../../../hooks/useTranslation';
+import { formatAmdCurrency } from '../../../utils/currency';
 
 interface PartsTableProps {
     rows: PartResource[];
@@ -114,10 +115,7 @@ export default function PartsTable({
                                 <TableCell>{part.car_id}</TableCell>
                                 <TableCell>{part.condition}</TableCell>
                                 <TableCell align="right">
-                                    {new Intl.NumberFormat('en-US', {
-                                        style: 'currency',
-                                        currency: 'USD',
-                                    }).format(part.price)}
+                                    {formatAmdCurrency(part.price)}
                                 </TableCell>
                                 <TableCell align="right">{part.quantity}</TableCell>
                                 <TableCell>

@@ -27,6 +27,7 @@ import PageHeader from './PageHeader';
 import StatusChip from './StatusChip';
 import type { ResourceRecord, Status } from '../types/resources';
 import { useTranslation } from '../hooks/useTranslation';
+import { formatAmdCurrency } from '../utils/currency';
 
 export interface Column<T> {
     key: keyof T;
@@ -82,11 +83,7 @@ function formatValue<T extends ResourceRecord>(row: T, column: Column<T>) {
     const value = row[column.key];
 
     if (column.type === 'currency' && typeof value === 'number') {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-            maximumFractionDigits: 0,
-        }).format(value);
+        return formatAmdCurrency(value);
     }
 
     if (column.type === 'status') {

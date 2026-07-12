@@ -25,7 +25,7 @@ export default function SettingsPage() {
                 <Stack spacing={2}>
                     <LanguageSelect size="medium" label />
                     <TextField label={t('settings.companyName')} defaultValue="Car Dismantler" />
-                    <TextField label={t('settings.defaultCurrency')} defaultValue="USD" />
+                    <TextField label={t('settings.defaultCurrency')} defaultValue="AMD" />
                     <FormControlLabel
                         control={<Switch defaultChecked />}
                         label={t('settings.lowStock')}
