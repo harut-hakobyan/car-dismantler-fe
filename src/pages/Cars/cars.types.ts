@@ -58,6 +58,17 @@ export interface CarFormValues {
     status: (typeof carStatuses)[number];
     purchase_price: number;
     sale_price: number;
+    excluded_parts: string[];
+}
+
+export interface CarCatalogPart {
+    id: number;
+    name: string;
+    category: string;
+    path: string;
+    sku: string;
+    url: string;
+    image_url?: string | null;
 }
 
 export type CarMakeOption = CarMakeResource;

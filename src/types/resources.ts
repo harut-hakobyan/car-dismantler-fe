@@ -46,12 +46,15 @@ export interface CarResource {
     purchase_price: number;
     sale_price: number;
     created_at: string;
+    excluded_parts?: string[];
 }
 
 export interface PartResource {
     id: number;
     car_id: number;
     name: string;
+    name_ru?: string | null;
+    name_hy?: string | null;
     sku: string;
     category: string;
     condition: string;
@@ -129,4 +132,36 @@ export interface CarModelResource {
     id: number;
     car_make_id: number;
     name: string;
+}
+
+export interface CatalogPartResource {
+    id: number;
+    name: string;
+    name_ru?: string | null;
+    name_hy?: string | null;
+    category: string;
+    path: string;
+    sku: string;
+    url: string;
+    image_url?: string | null;
+}
+
+export interface PartTemplateResource {
+    id: number;
+    car_make_id: number;
+    car_model_id: number;
+    make: string;
+    model: string;
+    start_year?: number | null;
+    end_year?: number | null;
+    name: string;
+    name_ru?: string | null;
+    name_hy?: string | null;
+    sku: string;
+    category: string;
+    path: string;
+    url: string;
+    image_url?: string | null;
+    sort_order: number;
+    fitment: string;
 }

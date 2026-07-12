@@ -104,6 +104,9 @@ export interface CarOption {
 export interface PartSaleOption {
     id: number;
     label: string;
+    name: string;
+    name_ru?: string | null;
+    name_hy?: string | null;
     sku: string;
     price: number;
     quantity: number;

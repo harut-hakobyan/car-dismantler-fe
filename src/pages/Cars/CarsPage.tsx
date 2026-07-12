@@ -44,6 +44,7 @@ function toFormValues(car: CarResource): CarFormValues {
         status: car.status as CarFormValues['status'],
         purchase_price: car.purchase_price,
         sale_price: car.sale_price,
+        excluded_parts: car.excluded_parts ?? [],
     };
 }
 
