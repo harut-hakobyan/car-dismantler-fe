@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { I18nContext } from './I18nContext';
 import {
     translations,
@@ -8,22 +8,12 @@ import {
 
 const storageKey = 'app_language';
 
-function getInitialLanguage(): Language {
-    const storedLanguage = localStorage.getItem(storageKey);
-
-    if (
-        storedLanguage === 'en' ||
-        storedLanguage === 'ru' ||
-        storedLanguage === 'hy'
-    ) {
-        return storedLanguage;
-    }
-
-    return 'en';
-}
-
 export function I18nProvider({ children }: { children: ReactNode }) {
-    const [language, setLanguageState] = useState<Language>(getInitialLanguage);
+    const [language, setLanguageState] = useState<Language>('en');
+
+    useEffect(() => {
+        localStorage.setItem(storageKey, 'en');
+    }, []);
 
     function setLanguage(nextLanguage: Language) {
         localStorage.setItem(storageKey, nextLanguage);
