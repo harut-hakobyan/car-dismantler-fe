@@ -19,7 +19,11 @@ import AcUnitIcon from '@mui/icons-material/AcUnit';
 import CompressIcon from '@mui/icons-material/Compress';
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
 import CategoryIcon from '@mui/icons-material/Category';
-import { partCategories, type PartCategory } from '../parts.types';
+import {
+    getPartCategoryLabelKey,
+    partCategories,
+    type PartCategory,
+} from '../parts.types';
 import { useTranslation } from '../../../hooks/useTranslation';
 
 interface PartCategorySelectProps {
@@ -69,7 +73,7 @@ export default function PartCategorySelect({
                     <ListItemIcon sx={{ minWidth: 36 }}>
                         {categoryIcons[category]}
                     </ListItemIcon>
-                    <ListItemText primary={category} />
+                    <ListItemText primary={t(getPartCategoryLabelKey(category))} />
                 </MenuItem>
             ))}
         </TextField>

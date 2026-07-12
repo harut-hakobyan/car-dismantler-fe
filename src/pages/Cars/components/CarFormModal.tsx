@@ -15,8 +15,9 @@ import {
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { CarMakeOption, CarModelOption, CarFormValues } from '../cars.types';
-import { carColors } from '../cars.types';
-import { carSchema } from '../cars.schema';
+import { carColorTranslationKeys, carColors, carStatusTranslationKeys, carStatuses } from '../cars.types';
+import { createCarSchema } from '../cars.schema';
+import { useTranslation } from '../../../hooks/useTranslation';
 
 interface Props {
     open: boolean;
@@ -53,6 +54,8 @@ export default function CarFormModal({
     onMakeChange,
     onSubmit,
 }: Props) {
+    const { t } = useTranslation();
+    const carSchema = useMemo(() => createCarSchema(t), [t]);
     const {
         control,
         handleSubmit,
@@ -101,7 +104,7 @@ export default function CarFormModal({
 
     return (
         <Dialog open={open} onClose={isSaving ? undefined : closeModal} fullWidth maxWidth="md">
-            <DialogTitle>{mode === 'edit' ? 'Edit Car' : 'Add Car'}</DialogTitle>
+            <DialogTitle>{mode === 'edit' ? t('cars.edit') : t('cars.add')}</DialogTitle>
             <DialogContent>
                 <Stack component="form" id="car-form" spacing={2} sx={{ mt: 1 }} onSubmit={handleSubmit(submit)}>
                     <Grid container spacing={2}>
@@ -112,7 +115,7 @@ export default function CarFormModal({
                                 render={({ field }) => (
                                     <TextField
                                         {...field}
-                                        label="VIN"
+                                        label={t('cars.vin')}
                                         fullWidth
                                         error={!!errors.vin}
                                         helperText={errors.vin?.message}
@@ -128,7 +131,7 @@ export default function CarFormModal({
                                     <TextField
                                         select
                                         {...field}
-                                        label="Make"
+                                        label={t('cars.make')}
                                         fullWidth
                                         value={field.value || ''}
                                         onChange={(event) => {
@@ -140,7 +143,7 @@ export default function CarFormModal({
                                         error={!!errors.car_make_id}
                                         helperText={errors.car_make_id?.message}
                                     >
-                                        <MenuItem value={0}>Select make</MenuItem>
+                                        <MenuItem value={0}>{t('cars.selectMake')}</MenuItem>
                                         {makes.map((make) => (
                                             <MenuItem key={make.id} value={make.id}>
                                                 {make.name}
@@ -158,14 +161,14 @@ export default function CarFormModal({
                                     <TextField
                                         select
                                         {...field}
-                                        label="Model"
+                                        label={t('cars.model')}
                                         fullWidth
                                         value={field.value || ''}
                                         disabled={!selectedMakeId}
                                         error={!!errors.car_model_id}
                                         helperText={errors.car_model_id?.message}
                                     >
-                                        <MenuItem value={0}>Select model</MenuItem>
+                                        <MenuItem value={0}>{t('cars.selectModel')}</MenuItem>
                                         {filteredModels.map((model) => (
                                             <MenuItem key={model.id} value={model.id}>
                                                 {model.name}
@@ -182,7 +185,7 @@ export default function CarFormModal({
                                 render={({ field }) => (
                                     <TextField
                                         {...field}
-                                        label="Year"
+                                        label={t('cars.year')}
                                         type="number"
                                         fullWidth
                                         onChange={(event) => field.onChange(Number(event.target.value))}
@@ -200,14 +203,14 @@ export default function CarFormModal({
                                     <TextField
                                         select
                                         {...field}
-                                        label="Color"
+                                        label={t('cars.color')}
                                         fullWidth
                                         value={field.value || ''}
                                         error={!!errors.color}
                                         helperText={errors.color?.message}
                                     >
                                         <MenuItem value="">
-                                            <em>Select color</em>
+                                            <em>{t('cars.selectColor')}</em>
                                         </MenuItem>
                                         {carColors.map((color) => (
                                             <MenuItem key={color} value={color}>
@@ -220,10 +223,10 @@ export default function CarFormModal({
                                                         border: '1px solid',
                                                         borderColor: 'divider',
                                                         mr: 1,
-                                                        flexShrink: 0,
-                                                    }}
-                                                />
-                                                {color}
+                                                    flexShrink: 0,
+                                                }}
+                                            />
+                                                {t(carColorTranslationKeys[color])}
                                             </MenuItem>
                                         ))}
                                     </TextField>
@@ -237,7 +240,7 @@ export default function CarFormModal({
                                 render={({ field }) => (
                                     <TextField
                                         {...field}
-                                        label="Mileage"
+                                        label={t('cars.mileage')}
                                         type="number"
                                         fullWidth
                                         onChange={(event) => field.onChange(Number(event.target.value))}
@@ -252,10 +255,10 @@ export default function CarFormModal({
                                 name="status"
                                 control={control}
                                 render={({ field }) => (
-                                    <TextField {...field} select label="Status" fullWidth>
-                                        {['active', 'inactive', 'pending'].map((status) => (
+                                    <TextField {...field} select label={t('cars.status')} fullWidth>
+                                        {carStatuses.map((status) => (
                                             <MenuItem key={status} value={status}>
-                                                {status}
+                                                {t(carStatusTranslationKeys[status])}
                                             </MenuItem>
                                         ))}
                                     </TextField>
@@ -269,7 +272,7 @@ export default function CarFormModal({
                                 render={({ field }) => (
                                     <TextField
                                         {...field}
-                                        label="Purchase price"
+                                        label={t('cars.purchase')}
                                         type="number"
                                         fullWidth
                                         onChange={(event) => field.onChange(Number(event.target.value))}
@@ -286,7 +289,7 @@ export default function CarFormModal({
                                 render={({ field }) => (
                                     <TextField
                                         {...field}
-                                        label="Sale price"
+                                        label={t('cars.sale')}
                                         type="number"
                                         fullWidth
                                         onChange={(event) => field.onChange(Number(event.target.value))}
@@ -300,7 +303,7 @@ export default function CarFormModal({
                 </Stack>
             </DialogContent>
             <DialogActions>
-                <Button onClick={closeModal}>Cancel</Button>
+                <Button onClick={closeModal}>{t('common.cancel')}</Button>
                 <Button
                     type="submit"
                     form="car-form"
@@ -308,7 +311,7 @@ export default function CarFormModal({
                     disabled={isSaving}
                     startIcon={isSaving ? <CircularProgress size={16} color="inherit" /> : undefined}
                 >
-                    Save
+                    {t('common.save')}
                 </Button>
             </DialogActions>
         </Dialog>

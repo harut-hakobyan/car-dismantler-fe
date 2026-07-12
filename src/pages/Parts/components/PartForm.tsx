@@ -20,6 +20,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import PartCategorySelect from './PartCategorySelect';
 import { partSchema } from '../parts.schema';
 import {
+    getPartConditionLabelKey,
+    getPartStatusLabelKey,
     partConditions,
     partStatuses,
     type CarOption,
@@ -173,7 +175,7 @@ export default function PartForm({
                                 >
                                     {partConditions.map((condition) => (
                                         <MenuItem key={condition} value={condition}>
-                                            {condition}
+                                            {t(getPartConditionLabelKey(condition))}
                                         </MenuItem>
                                     ))}
                                 </TextField>
@@ -196,7 +198,7 @@ export default function PartForm({
                                 >
                                     {partStatuses.map((status) => (
                                         <MenuItem key={status} value={status}>
-                                            {status}
+                                            {t(getPartStatusLabelKey(status))}
                                         </MenuItem>
                                     ))}
                                 </TextField>

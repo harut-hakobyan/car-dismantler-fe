@@ -20,6 +20,10 @@ import SearchIcon from '@mui/icons-material/Search';
 import StatusChip from '../../../components/StatusChip';
 import type { PartResource } from '../../../types/resources';
 import { useTranslation } from '../../../hooks/useTranslation';
+import {
+    getPartCategoryLabelKeyByValue,
+    getPartConditionLabelKeyByValue,
+} from '../parts.types';
 import { formatAmdCurrency } from '../../../utils/currency';
 
 interface PartsTableProps {
@@ -110,10 +114,16 @@ export default function PartsTable({
                                 </TableCell>
                                 <TableCell>{part.sku}</TableCell>
                                 <TableCell>
-                                    <Chip label={part.category} size="small" variant="outlined" />
+                                    <Chip
+                                        label={t(getPartCategoryLabelKeyByValue(part.category))}
+                                        size="small"
+                                        variant="outlined"
+                                    />
                                 </TableCell>
                                 <TableCell>{part.car_id}</TableCell>
-                                <TableCell>{part.condition}</TableCell>
+                                <TableCell>
+                                    {t(getPartConditionLabelKeyByValue(part.condition))}
+                                </TableCell>
                                 <TableCell align="right">
                                     {formatAmdCurrency(part.price)}
                                 </TableCell>

@@ -87,16 +87,16 @@ export default function CarsPage() {
                     id: editingCar.id,
                     payload: values as unknown as Omit<CarResource, 'id'>,
                 });
-                toast.success('Car updated');
+                toast.success(t('toast.carUpdated'));
             } else {
                 await createMutation.mutateAsync(values as unknown as Omit<CarResource, 'id'>);
-                toast.success('Car created');
+                toast.success(t('toast.carCreated'));
             }
 
             setAddOpen(false);
             setEditingCar(null);
         } catch (error) {
-            toast.error(error instanceof Error ? error.message : 'Failed to save car');
+            toast.error(error instanceof Error ? error.message : t('toast.carSaveError'));
         }
     }
 
@@ -112,7 +112,7 @@ export default function CarsPage() {
         }
 
         await deleteMutation.mutateAsync(deleteCar.id);
-        toast.success('Car deleted');
+        toast.success(t('toast.carDeleted'));
         setDeleteCar(null);
     }
 
@@ -244,8 +244,8 @@ export default function CarsPage() {
             />
 
             <Dialog open={!!deleteCar} onClose={() => setDeleteCar(null)}>
-                <DialogTitle>Delete car</DialogTitle>
-                <DialogContent>Are you sure you want to delete this car?</DialogContent>
+                <DialogTitle>{t('cars.deleteTitle')}</DialogTitle>
+                <DialogContent>{t('cars.deleteBody')}</DialogContent>
                 <DialogActions>
                     <Button onClick={() => setDeleteCar(null)}>{t('common.cancel')}</Button>
                     <Button color="error" variant="contained" onClick={confirmDelete}>
