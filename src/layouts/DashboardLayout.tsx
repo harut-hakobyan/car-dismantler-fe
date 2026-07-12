@@ -4,6 +4,7 @@ import {
     Box,
     Divider,
     Drawer,
+    Collapse,
     IconButton,
     List,
     ListItemButton,
@@ -14,6 +15,7 @@ import {
     Toolbar,
     Typography,
 } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import GroupIcon from '@mui/icons-material/Group';
@@ -25,7 +27,7 @@ import SecurityIcon from '@mui/icons-material/Security';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { useState, type MouseEvent, type ReactNode } from 'react';
+import { useEffect, useState, type MouseEvent, type ReactNode } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import LanguageSelect from '../components/LanguageSelect';
 import { useTranslation } from '../hooks/useTranslation';
@@ -38,7 +40,6 @@ const navItems = [
     { labelKey: 'nav.users', path: '/users', icon: <GroupIcon /> },
     { labelKey: 'nav.roles', path: '/roles', icon: <SecurityIcon /> },
     { labelKey: 'nav.cars', path: '/cars', icon: <DirectionsCarIcon /> },
-    { labelKey: 'nav.parts', path: '/parts', icon: <Inventory2Icon /> },
     { labelKey: 'nav.orders', path: '/orders', icon: <ShoppingCartIcon /> },
     { labelKey: 'nav.customers', path: '/customers', icon: <PeopleIcon /> },
     { labelKey: 'nav.settings', path: '/settings', icon: <SettingsIcon /> },
@@ -51,6 +52,13 @@ export default function DashboardLayout() {
     const location = useLocation();
     const [mobileOpen, setMobileOpen] = useState(false);
     const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
+    const [partsExpanded, setPartsExpanded] = useState(location.pathname.startsWith('/parts'));
+
+    useEffect(() => {
+        if (location.pathname.startsWith('/parts')) {
+            setPartsExpanded(true);
+        }
+    }, [location.pathname]);
 
     async function handleLogout() {
         await logout();
@@ -103,6 +111,48 @@ export default function DashboardLayout() {
                         </ListItemButton>
                     );
                 })}
+
+                <ListItemButton
+                    onClick={() => setPartsExpanded((value) => !value)}
+                    selected={location.pathname.startsWith('/parts')}
+                    sx={{ borderRadius: 1.5, mb: 0.5 }}
+                >
+                    <ListItemIcon>
+                        <Inventory2Icon />
+                    </ListItemIcon>
+                    <ListItemText primary={t('nav.partsGroup')} />
+                    <ExpandMoreIcon
+                        sx={{
+                            transform: partsExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                            transition: 'transform 0.2s ease',
+                        }}
+                    />
+                </ListItemButton>
+
+                <Collapse in={partsExpanded} timeout="auto" unmountOnExit>
+                    <List component="div" disablePadding sx={{ pl: 2 }}>
+                        <ListItemButton
+                            selected={location.pathname === '/parts'}
+                            onClick={() => {
+                                navigate('/parts');
+                                setMobileOpen(false);
+                            }}
+                            sx={{ borderRadius: 1.5, mb: 0.5 }}
+                        >
+                            <ListItemText primary={t('nav.partsInventory')} />
+                        </ListItemButton>
+                        <ListItemButton
+                            selected={location.pathname.startsWith('/parts/templates')}
+                            onClick={() => {
+                                navigate('/parts/templates');
+                                setMobileOpen(false);
+                            }}
+                            sx={{ borderRadius: 1.5, mb: 0.5 }}
+                        >
+                            <ListItemText primary={t('nav.partTemplates')} />
+                        </ListItemButton>
+                    </List>
+                </Collapse>
             </List>
 
             <Divider />

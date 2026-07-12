@@ -15,6 +15,7 @@ import UsersPage from '../pages/Users/UsersPage';
 import RolesPage from '../pages/Roles/RolesPage';
 import CarsPage from '../pages/Cars/CarsPage';
 import PartsPage from '../pages/Parts/PartsPage';
+import PartTemplatesPage from '../pages/PartTemplates/PartTemplatesPage';
 import OrdersPage from '../pages/Orders/OrdersPage';
 import CustomersPage from '../pages/Customers/CustomersPage';
 import ProfilePage from '../pages/Profile/ProfilePage';
@@ -66,6 +67,11 @@ export default function AppRouter() {
                     <Route
                         path="parts"
                         element={<PartsPage />}
+                    />
+
+                    <Route
+                        path="parts/templates"
+                        element={<PartTemplatesPage />}
                     />
 
                     <Route

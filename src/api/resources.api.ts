@@ -8,6 +8,7 @@ import type {
     DashboardSummary,
     CarMakeResource,
     CarModelResource,
+    CatalogPartResource,
     OrderResource,
     PartResource,
     PermissionResource,
@@ -92,6 +93,9 @@ export const carsApi = {
     },
     async models(makeId: number) {
         return (await api.get<CarModelResource[]>(`/car-makes/${makeId}/models`)).data;
+    },
+    async catalogPreview(payload: { car_make_id: number; car_model_id: number; year: number }) {
+        return (await api.get<CatalogPartResource[]>('/cars/catalog-preview', { params: payload })).data;
     },
     async create(payload: Omit<CarResource, 'id'>) {
         return (await api.post<CarResource>('/cars', payload)).data;

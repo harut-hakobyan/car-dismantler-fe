@@ -9,11 +9,31 @@ import {
 const storageKey = 'app_language';
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-    const [language, setLanguageState] = useState<Language>('en');
+    const [language, setLanguageState] = useState<Language>(() => {
+        if (typeof window === 'undefined') {
+            return 'en';
+        }
+
+        const storedLanguage = localStorage.getItem(storageKey);
+        if (storedLanguage === 'en' || storedLanguage === 'ru' || storedLanguage === 'hy') {
+            return storedLanguage;
+        }
+
+        const browserLanguage = navigator.language.toLowerCase();
+        if (browserLanguage.startsWith('hy')) {
+            return 'hy';
+        }
+
+        if (browserLanguage.startsWith('ru')) {
+            return 'ru';
+        }
+
+        return 'en';
+    });
 
     useEffect(() => {
-        localStorage.setItem(storageKey, 'en');
-    }, []);
+        localStorage.setItem(storageKey, language);
+    }, [language]);
 
     function setLanguage(nextLanguage: Language) {
         localStorage.setItem(storageKey, nextLanguage);
@@ -24,7 +44,12 @@ export function I18nProvider({ children }: { children: ReactNode }) {
         () => ({
             language,
             setLanguage,
-            t: (key: TranslationKey) => translations[language][key] ?? translations.en[key],
+            t: (key: TranslationKey) => {
+                const currentTranslations = translations[language] as Record<TranslationKey, string>;
+                const fallbackTranslations = translations.en as Record<TranslationKey, string>;
+
+                return currentTranslations[key] ?? fallbackTranslations[key];
+            },
         }),
         [language]
     );

@@ -21,6 +21,7 @@ import { sellPartSchema } from '../parts.schema';
 import type { PartSaleOption, SellPartFormValues } from '../parts.types';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { AMD_CURRENCY_SYMBOL } from '../../../utils/currency';
+import { getLocalizedPartLabel } from '../../../utils/partLocalization';
 
 interface SellPartModalProps {
     open: boolean;
@@ -45,7 +46,7 @@ export default function SellPartModal({
     onClose,
     onSubmit,
 }: SellPartModalProps) {
-    const { t } = useTranslation();
+    const { t, language } = useTranslation();
     const {
         control,
         handleSubmit,
@@ -145,10 +146,10 @@ export default function SellPartModal({
                                             <MenuItem value={0}>{t('parts.selectPart')}</MenuItem>
                                             {parts.map((part) => (
                                                 <MenuItem key={part.id} value={part.id}>
-                                                    {part.label} ({part.quantity} {t('parts.available')})
-                                                </MenuItem>
-                                            ))}
-                                        </TextField>
+                                                {getLocalizedPartLabel(part, language)} ({part.quantity} {t('parts.available')})
+                                            </MenuItem>
+                                        ))}
+                                    </TextField>
                                     )}
                                 />
                             </Grid>

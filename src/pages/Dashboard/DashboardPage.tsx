@@ -23,9 +23,10 @@ import { dashboardApi } from '../../api/resources.api';
 import { useTranslation } from '../../hooks/useTranslation';
 import { formatAmdCurrency } from '../../utils/currency';
 import { getPartCategoryLabelKeyByValue } from '../Parts/parts.types';
+import { getLocalizedPartName } from '../../utils/partLocalization';
 
 export default function DashboardPage() {
-    const { t } = useTranslation();
+    const { t, language } = useTranslation();
     const summaryQuery = useQuery({
         queryKey: ['dashboard-summary'],
         queryFn: dashboardApi.summary,
@@ -272,7 +273,7 @@ export default function DashboardPage() {
                                 >
                                     <Box>
                                         <Typography sx={{ fontWeight: 700 }}>
-                                            {part.name}
+                                            {getLocalizedPartName(part, language)}
                                         </Typography>
                                         <Typography color="text.secondary" variant="caption">
                                             {part.sku}
@@ -369,7 +370,7 @@ export default function DashboardPage() {
                             <TableBody>
                                 {(details?.topParts ?? []).map((part) => (
                                     <TableRow key={part.id}>
-                                        <TableCell>{part.name}</TableCell>
+                                        <TableCell>{getLocalizedPartName(part, language)}</TableCell>
                                         <TableCell>{t(getPartCategoryLabelKeyByValue(part.category))}</TableCell>
                                         <TableCell align="right">{part.quantity}</TableCell>
                                         <TableCell align="right">

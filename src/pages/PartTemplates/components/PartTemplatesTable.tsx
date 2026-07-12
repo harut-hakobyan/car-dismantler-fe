@@ -17,29 +17,23 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import SearchIcon from '@mui/icons-material/Search';
-import StatusChip from '../../../components/StatusChip';
-import type { PartResource } from '../../../types/resources';
 import { useTranslation } from '../../../hooks/useTranslation';
-import {
-    getPartCategoryLabelKeyByValue,
-    getPartConditionLabelKeyByValue,
-} from '../parts.types';
-import { formatAmdCurrency } from '../../../utils/currency';
+import type { PartTemplateResource } from '../../../types/resources';
 import { getLocalizedPartName } from '../../../utils/partLocalization';
 
-interface PartsTableProps {
-    rows: PartResource[];
+interface Props {
+    rows: PartTemplateResource[];
     total: number;
     page: number;
     perPage: number;
     search: string;
     onSearchChange: (value: string) => void;
     onPageChange: (page: number) => void;
-    onEdit: (part: PartResource) => void;
-    onDelete: (part: PartResource) => void;
+    onEdit: (template: PartTemplateResource) => void;
+    onDelete: (template: PartTemplateResource) => void;
 }
 
-export default function PartsTable({
+export default function PartTemplatesTable({
     rows,
     total,
     page,
@@ -49,7 +43,7 @@ export default function PartsTable({
     onPageChange,
     onEdit,
     onDelete,
-}: PartsTableProps) {
+}: Props) {
     const { t, language } = useTranslation();
     const pageCount = Math.max(1, Math.ceil(total / perPage));
 
@@ -72,7 +66,7 @@ export default function PartsTable({
                     }}
                 />
                 <Typography color="text.secondary" variant="body2">
-                    {total} {t('parts.inventoryRecords')}
+                    {total} {t('parts.templates.inventoryRecords')}
                 </Typography>
             </Stack>
 
@@ -80,72 +74,51 @@ export default function PartsTable({
                 <Table size="small">
                     <TableHead>
                         <TableRow>
-                            <TableCell>{t('parts.part')}</TableCell>
-                            <TableCell>{t('parts.sku')}</TableCell>
-                            <TableCell>{t('parts.category')}</TableCell>
-                            <TableCell>{t('parts.carId')}</TableCell>
-                            <TableCell>{t('parts.condition')}</TableCell>
-                            <TableCell align="right">{t('parts.price')}</TableCell>
-                            <TableCell align="right">{t('parts.quantity')}</TableCell>
-                            <TableCell>{t('parts.status')}</TableCell>
-                            <TableCell align="right">{t('parts.actions')}</TableCell>
+                            <TableCell>{t('parts.templates.name')}</TableCell>
+                            <TableCell>{t('parts.templates.fitment')}</TableCell>
+                            <TableCell>{t('parts.templates.sku')}</TableCell>
+                            <TableCell>{t('parts.templates.category')}</TableCell>
+                            <TableCell>{t('parts.templates.sortOrder')}</TableCell>
+                            <TableCell align="right">{t('common.actions')}</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {rows.map((part) => (
-                            <TableRow key={part.id} hover>
+                        {rows.map((template) => (
+                            <TableRow key={template.id} hover>
                                 <TableCell>
                                     <Stack spacing={0.25}>
                                         <Typography sx={{ fontWeight: 700 }}>
-                                            {getLocalizedPartName(part, language)}
+                                            {getLocalizedPartName(template, language)}
                                         </Typography>
-                                        <Typography
-                                            color="text.secondary"
-                                            variant="caption"
-                                            sx={{
-                                                display: '-webkit-box',
-                                                WebkitLineClamp: 1,
-                                                WebkitBoxOrient: 'vertical',
-                                                overflow: 'hidden',
-                                            }}
-                                        >
-                                            {part.description}
+                                        <Typography color="text.secondary" variant="caption">
+                                            {template.name} / {template.name_ru ?? '-'} / {template.name_hy ?? '-'}
                                         </Typography>
                                     </Stack>
                                 </TableCell>
-                                <TableCell>{part.sku}</TableCell>
                                 <TableCell>
-                                    <Chip
-                                        label={t(getPartCategoryLabelKeyByValue(part.category))}
-                                        size="small"
-                                        variant="outlined"
-                                    />
+                                    <Stack spacing={0.25}>
+                                        <Typography variant="body2">{template.fitment}</Typography>
+                                        <Typography color="text.secondary" variant="caption">
+                                            {template.start_year ?? '-'} - {template.end_year ?? '-'}
+                                        </Typography>
+                                    </Stack>
                                 </TableCell>
-                                <TableCell>{part.car_id}</TableCell>
+                                <TableCell>{template.sku}</TableCell>
                                 <TableCell>
-                                    {t(getPartConditionLabelKeyByValue(part.condition))}
+                                    <Chip label={template.category} size="small" variant="outlined" />
                                 </TableCell>
+                                <TableCell>{template.sort_order}</TableCell>
                                 <TableCell align="right">
-                                    {formatAmdCurrency(part.price)}
-                                </TableCell>
-                                <TableCell align="right">{part.quantity}</TableCell>
-                                <TableCell>
-                                    <StatusChip status={part.status} />
-                                </TableCell>
-                                <TableCell align="right">
-                                    <Tooltip title={t('parts.edit')}>
-                                        <IconButton
-                                            size="small"
-                                            onClick={() => onEdit(part)}
-                                        >
+                                    <Tooltip title={t('common.edit')}>
+                                        <IconButton size="small" onClick={() => onEdit(template)}>
                                             <EditIcon fontSize="small" />
                                         </IconButton>
                                     </Tooltip>
-                                    <Tooltip title={t('parts.delete')}>
+                                    <Tooltip title={t('common.delete')}>
                                         <IconButton
                                             color="error"
                                             size="small"
-                                            onClick={() => onDelete(part)}
+                                            onClick={() => onDelete(template)}
                                         >
                                             <DeleteIcon fontSize="small" />
                                         </IconButton>
@@ -156,8 +129,8 @@ export default function PartsTable({
 
                         {rows.length === 0 && (
                             <TableRow>
-                                <TableCell colSpan={9}>
-                                    {t('parts.noParts')}
+                                <TableCell colSpan={6}>
+                                    {t('parts.templates.noTemplates')}
                                 </TableCell>
                             </TableRow>
                         )}

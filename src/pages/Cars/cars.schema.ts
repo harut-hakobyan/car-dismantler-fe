@@ -13,5 +13,6 @@ export function createCarSchema(t: (key: TranslationKey) => string) {
         status: z.enum(carStatuses),
         purchase_price: z.number().min(0),
         sale_price: z.number().min(0),
+        excluded_parts: z.array(z.string()),
     });
 }
