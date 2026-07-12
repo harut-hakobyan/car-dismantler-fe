@@ -1,4 +1,4 @@
-name: Deploy Production
+name: Deploy Frontend Production
 
 on:
   push:
@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy backend and frontend
+      - name: Deploy frontend
         uses: appleboy/ssh-action@v1.2.5
         with:
           host: ${{ secrets.HOST }}
@@ -23,98 +23,73 @@ jobs:
           script: |
             set -e
 
-            echo "===================================="
-            echo "Updating Backend"
-            echo "===================================="
-            cd ~/car-dismantler/car-dismantler-be
-            git fetch origin master
-            git reset --hard origin/master
+            (
+              flock -n 9 || {
+                echo "Another deployment is already running."
+                exit 1
+              }
 
-            echo "===================================="
-            echo "Updating Frontend"
-            echo "===================================="
-            cd ~/car-dismantler/car-dismantler-fe
-            git fetch origin master
-            git reset --hard origin/master
+              COMPOSE="docker compose --project-name car-dismantler --env-file .env.production -f docker-compose.production.yml"
 
-            echo "===================================="
-            echo "Building Docker Images"
-            echo "===================================="
-            cd ~/car-dismantler
+              echo "===================================="
+              echo "Updating Frontend"
+              echo "===================================="
 
-            docker compose \
-              --env-file .env.production \
-              -f docker-compose.production.yml \
-              build --no-cache
+              cd ~/car-dismantler/car-dismantler-fe
 
-            echo "===================================="
-            echo "Recreating Containers"
-            echo "===================================="
+              git fetch origin master
+              git reset --hard origin/master
 
-            docker compose \
-              --env-file .env.production \
-              -f docker-compose.production.yml \
-              up -d --force-recreate --remove-orphans
+              echo "===================================="
+              echo "Building Frontend Image"
+              echo "===================================="
 
-            echo "Waiting for containers..."
-            sleep 10
+              cd ~/car-dismantler
 
-            echo "===================================="
-            echo "Running Migrations & Seeders"
-            echo "===================================="
+              $COMPOSE build --no-cache frontend
 
-            docker compose \
-              --env-file .env.production \
-              -f docker-compose.production.yml \
-              exec -T backend-app \
-              php artisan migrate --seed --force
+              echo "===================================="
+              echo "Recreating Frontend Container"
+              echo "===================================="
 
-            echo "===================================="
-            echo "Clearing Cache"
-            echo "===================================="
+              docker ps -a \
+                --format '{{.ID}} {{.Names}}' \
+                | awk '$2 ~ /^[a-f0-9]+_car-dismantler-frontend$/ {print $1}' \
+                | xargs -r docker rm -f
 
-            docker compose \
-              --env-file .env.production \
-              -f docker-compose.production.yml \
-              exec -T backend-app \
-              php artisan optimize:clear
+              $COMPOSE up -d \
+                --force-recreate \
+                --no-deps \
+                frontend
 
-            echo "===================================="
-            echo "Optimizing Laravel"
-            echo "===================================="
+              echo "Waiting for frontend..."
+              sleep 10
 
-            docker compose \
-              --env-file .env.production \
-              -f docker-compose.production.yml \
-              exec -T backend-app \
-              php artisan optimize
+              echo "===================================="
+              echo "Frontend Container Status"
+              echo "===================================="
 
-            echo "===================================="
-            echo "Container Status"
-            echo "===================================="
+              $COMPOSE ps frontend
 
-            docker compose \
-              --env-file .env.production \
-              -f docker-compose.production.yml \
-              ps
+              echo "===================================="
+              echo "Frontend Health Check"
+              echo "===================================="
 
-            echo "===================================="
-            echo "Backend Health Check"
-            echo "===================================="
+              curl \
+                --fail \
+                --retry 20 \
+                --retry-delay 3 \
+                --retry-connrefused \
+                http://127.0.0.1:8080
 
-            curl \
-              --fail \
-              --retry 20 \
-              --retry-delay 3 \
-              --retry-connrefused \
-              http://127.0.0.1:8081/api/test
+              echo "===================================="
+              echo "Cleaning Unused Docker Images"
+              echo "===================================="
 
-            echo "===================================="
-            echo "Cleaning Docker Images"
-            echo "===================================="
+              docker image prune -f
 
-            docker image prune -f
+              echo "===================================="
+              echo "Frontend Deployment Completed"
+              echo "===================================="
 
-            echo "===================================="
-            echo "Deployment Completed Successfully"
-            echo "===================================="
+            ) 9>/tmp/car-dismantler-deploy.lock
