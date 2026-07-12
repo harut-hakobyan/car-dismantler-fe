@@ -22,6 +22,7 @@ import StatusChip from '../../components/StatusChip';
 import { dashboardApi } from '../../api/resources.api';
 import { useTranslation } from '../../hooks/useTranslation';
 import { formatAmdCurrency } from '../../utils/currency';
+import { getPartCategoryLabelKeyByValue } from '../Parts/parts.types';
 
 export default function DashboardPage() {
     const { t } = useTranslation();
@@ -369,7 +370,7 @@ export default function DashboardPage() {
                                 {(details?.topParts ?? []).map((part) => (
                                     <TableRow key={part.id}>
                                         <TableCell>{part.name}</TableCell>
-                                        <TableCell>{part.category}</TableCell>
+                                        <TableCell>{t(getPartCategoryLabelKeyByValue(part.category))}</TableCell>
                                         <TableCell align="right">{part.quantity}</TableCell>
                                         <TableCell align="right">
                                             {formatCurrency(part.price * part.quantity)}
